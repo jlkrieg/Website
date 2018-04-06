@@ -1,0 +1,18 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<div id="library">
+<div><label ref="sortBooks">Sort by: </label><select id="sortBooks" name="sortBooks" size="1" onchange="javascript:LIBRARY.sorting=document.getElementById('sortBooks').selectedIndex;LIBRARY.display(0);"><option selected="selected">title</option><option>author</option><option>year</option><option>publisher</option><option>language</option><option>location</option></select><label ref="searchBooks" style="margin-left: 10px;">Search for: </label><input id="searchBooks"></input><button onclick="javascript: searchBooks(document.getElementById('searchBooks').value);">start</button></div>
+<div class="listingBar"> </div>
+<div id="libraryContent">
+</div>
+<div class="listingBar"> </div>
+</div>
+<p id="bookBase" class="body" style="display:none;"> <br /><a class="state-internal" style="font-weight: bold;"></a><br /><span> </span><br /><span> </span><br /><span> </span><br /><span> </span></p>
+<script type="text/javascript" src="bibliothekshortened.js"></script>
+<script type="text/javascript" src="bibliothekmain.js"></script>
+</body>
+</html>
