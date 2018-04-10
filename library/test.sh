@@ -21,7 +21,7 @@ echo -e "Recent changes inside the bibTex file:" >> tmpdir/mail.log
 echo -e ${diff} >> tmpdir/mail.log 
 echo -e "\nThe new bibTex file is located at ${path}/${BibFile}.bib." >>  tmpdir/mail.log 
 echo ${diff}
-if [${diff} == ""]
+if ! [${diff} == ""]
 then
 echo really no mail
 fi

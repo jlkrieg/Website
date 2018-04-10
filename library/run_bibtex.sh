@@ -7,29 +7,31 @@
 TransFile="bib.py"
 InFile="/users/eeh/vschneider/library/BibiliothekTL-HL" #.xls
 BibFile="BibiliothekTL-HL" #.bib
-#path="/mnt/eeh/kind/wwweep/bibliothek"
-path="/users/ehs/jlkrieg/website/bibliothek"
+path="/mnt/eeh/kind/wwweep/bibliothek"
 cd $path
 
 cp ${BibFile}.bib ${BibFile}_old.bib
 python ${TransFile} ${InFile}
 
-#DIFF=$(diff -q ${BibFile}.bib ${BibFile}_old.bib) 
-#if [ "$DIFF" != "" ] 
-#then
-#   mailto=$(cat recipients)40964096
-#   cop=$(cat sender)
-#   from=${cop}
-#   
-#	diff=$(diff ${BibFile}.bib ${BibFile}_old.bib)
-#   
-#	mkdir -p tmpdir
-#	echo -e "Log message:\nThis mail was sent automatically.\n" >> tmpdir/mail.log
-#	echo -e "Recent changes inside the bibTex file:" >> tmpdir/mail.log 
-#	echo -e ${diff} >> tmpdir/mail.log 
-#	echo -e "\nThe new bibTex file is located at ${path}/${BibFile}.bib." >> tmpdir/mail.log 
-#	subject='Please update the library content.'
-#	/users/eeh/kind/bin/sendEmail -f ${from} -t ${mailto} -cc ${cop} -u ${subject} -s mail.physik.hu-berlin.de -m "`cat tmpdir/mail.log`" > /dev/null 2>&1
-#	rm -rf tmpdir
-#fi
+DIFF=$(diff -q ${BibFile}.bib ${BibFile}_old.bib) 
+if [ "$DIFF" != "" ] 
+then
+   mailto=$(cat recipients)
+   cop=$(cat sender)
+   from=${cop}
+   
+	diff=$(diff ${BibFile}.bib ${BibFile}_old.bib)
+   
+	mkdir -p tmpdir
+	echo -e "Log message:\nThis mail was sent automatically.\n" >> tmpdir/mail.log
+	echo -e "Recent changes inside the bibTex file:" >> tmpdir/mail.log 
+	echo -e ${diff} >> tmpdir/mail.log 
+	echo -e "\nThe new bibTex file is located at ${path}/${BibFile}.bib." >> tmpdir/mail.log
+	subject='Please update the library content.'
+	if ! [${diff} == ""]
+	then		
+		/users/eeh/kind/bin/sendEmail -f ${from} -t ${mailto} -cc ${cop} -u ${subject} -s mail.physik.hu-berlin.de -m "`cat tmpdir/mail.log`" > /dev/null 2>&1
+	fi
+	rm -rf tmpdir
+fi
 rm ${BibFile}_old.bib

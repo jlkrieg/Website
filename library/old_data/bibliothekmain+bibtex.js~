@@ -3,68 +3,45 @@ const LIBRARY_CONTAINER = "libraryContent";
 
 const SORT = {"TITLE" : 0, "AUTHOR" : 1, "YEAR" : 2, "PUB" : 3, "LANG" : 4, "LOCATION" : 5};
 
-const REPLACE = {"Ä" : "AE", "Ö" : "OE", "ß" : "SS", "Ü" : "UE", "Â" : "A", "Ê" : "E", "Î" : "I", "Ô" : "O", "Û" : "U", "Á" : "A", "É" : "E", "Í" : "I", "Ó" : "O", "Ú" : "U", "À" : "A", "È" : "E", "Ì" : "I", "Ò" : "O", "Ù" : "U"};
-const REPLACE_KEYS = Object.keys(REPLACE);
-
 function clearNode(node) {
 	for (i=node.childNodes.length-1; i>=0; i--) {
 		node.removeChild(node.childNodes[i]);
 	}
 }
 
-function normalizeString(s) {
-	s = s.toUpperCase();
-	for (i=0; i<REPLACE_KEYS.length; i++) {
-		s = s.replace(REPLACE_KEYS[i], REPLACE[REPLACE_KEYS[i]]);
-	}
-	return s;
-}
-
 function cmpTitle(a,b) {
-	at = normalizeString(a.title); bt = normalizeString(b.title);
-	if (at != bt)
-		return 2*(at>bt)-1;
-	aa = normalizeString(a.author); ba = normalizeString(b.author);
-	if (aa != ba)
-		return 2*(aa>ba)-1;
-	ay = normalizeString(a.year); by = normalizeString(b.year);
-	if (ay != by)
-		return 2*(ay<by)-1;
-	al = normalizeString(a.language); bl = normalizeString(b.language);
-	if (al != bl)
-		return 2*(al>bl)-1;
+	if (a.title.toUpperCase() != b.title.toUpperCase())
+		return 2*(a.title.toUpperCase()>b.title.toUpperCase())-1;
+	if (a.author.toUpperCase() != b.author.toUpperCase())
+		return 2*(a.author.toUpperCase()>b.author.toUpperCase())-1;
+	if (a.year.toUpperCase() != b.year.toUpperCase())
+		return 2*(a.year.toUpperCase()<b.year.toUpperCase())-1;
+	if (a.language.toUpperCase() != b.language.toUpperCase())
+		return 2*(a.language.toUpperCase()>b.language.toUpperCase())-1;
 	return 0;
 }
 
 function cmpAuthor(a,b) {
-	aa = normalizeString(a.author); ba = normalizeString(b.author);
-	if (aa != ba)
-		return 2*(aa>ba)-1;
-	at = normalizeString(a.title); bt = normalizeString(b.title);
-	if (at != bt)
-		return 2*(at>bt)-1;
-	ay = normalizeString(a.year); by = normalizeString(b.year);
-	if (ay != by)
-		return 2*(ay<by)-1;
-	al = normalizeString(a.language); bl = normalizeString(b.language);
-	if (al != bl)
-		return 2*(al>bl)-1;
+	if (a.author.toUpperCase() != b.author.toUpperCase())
+		return 2*(a.author.toUpperCase()>b.author.toUpperCase())-1;
+	if (a.title.toUpperCase() != b.title.toUpperCase())
+		return 2*(a.title.toUpperCase()>b.title.toUpperCase())-1;
+	if (a.year.toUpperCase() != b.year.toUpperCase())
+		return 2*(a.year.toUpperCase()<b.year.toUpperCase())-1;
+	if (a.language.toUpperCase() != b.language.toUpperCase())
+		return 2*(a.language.toUpperCase()>b.language.toUpperCase())-1;
 	return 0;
 }
 
 function cmpYear(a,b) {
-	ay = normalizeString(a.year); by = normalizeString(b.year);
-	if (ay != by)
-		return 2*(ay<by)-1;
-	at = normalizeString(a.title); bt = normalizeString(b.title);
-	if (at != bt)
-		return 2*(at>bt)-1;
-	aa = normalizeString(a.author); ba = normalizeString(b.author);
-	if (aa != ba)
-		return 2*(aa>ba)-1;
-	al = normalizeString(a.language); bl = normalizeString(b.language);
-	if (al != bl)
-		return 2*(al>bl)-1;
+	if (a.year.toUpperCase() != b.year.toUpperCase())
+		return 2*(a.year.toUpperCase()<b.year.toUpperCase())-1;
+	if (a.title.toUpperCase() != b.title.toUpperCase())
+		return 2*(a.title.toUpperCase()>b.title.toUpperCase())-1;
+	if (a.author.toUpperCase() != b.author.toUpperCase())
+		return 2*(a.author.toUpperCase()>b.author.toUpperCase())-1;
+	if (a.language.toUpperCase() != b.language.toUpperCase())
+		return 2*(a.language.toUpperCase()>b.language.toUpperCase())-1;
 	return 0;
 }
 
@@ -130,7 +107,7 @@ function Library() {
 	this.sorting = SORT.TITLE;
 	/*
 	Analyses all books that occur block-wise (seperated by \n\n) and have the following form:
-		{author}{title}{year}{publisher}{ISBN}{-number}{language}{location}
+		{author}{title}{year}{publisher}{ISBN}{number}{language}{location}
 	*/
 	this.analyse = function(response) {
 		this.books = new Array();
@@ -144,7 +121,7 @@ function Library() {
 				desc = desc.substr(index+1, desc.length);
 			}
 			this.books[i] = new Book(entries[0], entries[1], entries[2],
-				entries[3], entries[4], entries[5], entries[6]);
+				entries[3], entries[4], entries[5], entries[6], entries[7]);
 		}
 	};
 	this.display = function(n) {
@@ -174,7 +151,7 @@ function Library() {
 		/* add all entries */
 		min = (n+ELEMENTS>this.books.length?this.books.length:n+ELEMENTS);
 		for (i=n; i<min; i++) {
-			this.books[i].display();
+			this.books[i].display(i);
 		}
 		/* create navigation */
 		listingBars = document.getElementById("library").getElementsByClassName("listingBar");
@@ -258,29 +235,31 @@ function Library() {
 This is just a container for the informations about the book to keep them in
 one place to ease up sorting, searching, redrawing etc.
 */
-function Book(author, title, year, publisher, ISBN,
+function Book(author, title, year, publisher, ISBN, number,
 		language, location) {
 	this.author = author;
 	this.title = title;
 	this.year = year;
 	this.publisher = publisher;
 	this.ISBN = ISBN;
+	this.number = number;
 	this.location = location;
 	this.language = language;
 	/*
 	Clone the template paragraph and fill it with informations according to the
 	book.
 	*/
-	this.display = function() {
+	this.display = function(index) {
 		var container = document.getElementById(LIBRARY_CONTAINER);
 		clone = document.getElementById("bookBase").cloneNode(true);
 		clone.removeAttribute("id");
 		clone.childNodes[0].textContent = this.author + " (" + this.year + ").";
 		clone.childNodes[2].textContent = this.title;
-		clone.childNodes[4].textContent = this.publisher
-		clone.childNodes[6].textContent = (this.ISBN.indexOf("ISSN") == -1 && this.ISBN.indexOf("ASIN") == -1 ? "ISBN: " : "") + this.ISBN; /* what exactly is ASIN? */
-		clone.childNodes[8].textContent = "Location: " + this.location;
-		clone.childNodes[10].textContent = "Language: " + this.language;
+      clone.childNodes[2].setAttribute("href", "javascript:onBookPressed("+index+");")
+		clone.childNodes[4].textContent = this.publisher + ". (" + (this.ISBN.indexOf("ISSN") == -1 && this.ISBN.indexOf("ASIN") == -1 ? "ISBN: " : "") + this.ISBN + ").";/* what exactly is ASIN? */
+		clone.childNodes[6].textContent = "Location: " + this.location;
+		clone.childNodes[8].textContent = "Language: " + this.language;
+		clone.childNodes[10].textContent = "Number: " + this.number;
 		clone.style.display = "";
 		container.appendChild(clone);
 	};
@@ -291,6 +270,15 @@ function onSearchKeyPressed(evt) {
 		return true;
 	searchBooks(document.getElementById("searchBooks").value);
 	return false;
+}
+
+function onBookPressed(b) {
+   var book = LIBRARY.books[b];
+   var win = window.open("", "Bibitem: "+ book.author+" - "+book.title, "width=300,height=200", );
+   var doc = win.document.open("text/plain");
+   doc.write("@book {0,\ntitle = \"{"+ book.title + "}\",\nauthor = \"{"+book.author+"}\,\nyear = \"{"+book.year+"}\,\npublisher = \"{"+book.publisher+"}\,\nISBN = \"{"+ book.ISBN +"}\"\n}");
+   doc.close();
+   win.focus();
 }
 
 /*
